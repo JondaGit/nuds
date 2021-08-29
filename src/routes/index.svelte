@@ -57,7 +57,7 @@
 <body>
     <img src="static/bg.jpg" alt="Countdown">
     <counter>{days} : {hours} : {minutes} : {seconds}</counter>
-    <p class="svatek-text">Dnes má svátek {svatek}</p>
+    <p class="svatek-text">Dnes má svátek {svatek}</p> 
     <div class="buttons">
         <Button variation="clear" href="/sprint-0-20">0-20</Button>
         <Button variation="clear" href="/sprint-20-40">20-40</Button>
