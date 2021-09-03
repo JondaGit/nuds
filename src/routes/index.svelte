@@ -12,7 +12,7 @@
 
     let currentTime = new Date();
     
-    const destTime = new Date(2021,9,31,23,59);
+    const destTime = new Date(2021,10,1,0,0);
     $: diffTime = Math.abs(destTime.valueOf() - currentTime.valueOf());
 
     let days: string;
@@ -32,15 +32,21 @@
     };
 
     let svatek: string = "";
+    let svatekSk: string = "";
 
     onMount(async () => {
         const day: string = currentTime.getDate().toString().padStart(2,'0');
         const month: string = (currentTime.getMonth() + 1).toString().padStart(2,'0');
         let apiURL = `https://svatky.adresa.info/json?date=${day}${month}`;
-        const response = from(fetch(apiURL));
-        response.pipe(switchMap((data: Response) => from(data.json()))).subscribe({
+        let apiURLSk = `https://svatky.adresa.info/json?date=${day}${month}&lang=sk`;
+        from(fetch(apiURL)).pipe(switchMap((data: Response) => from(data.json()))).subscribe({
             next: (data) => {
                 svatek = data[0].name;
+            }
+        });
+        from(fetch(apiURLSk)).pipe(switchMap((data: Response) => from(data.json()))).subscribe({
+            next: (data) => {
+                svatekSk = data[0].name;
             }
         });
 
@@ -53,7 +59,7 @@
 		};
 	});
 
-    let sprintButtonsVisible: boolean = true;
+    let sprintButtonsVisible: boolean = false;
 
     function sprintClick() {
         console.log("Sprint clicked");
@@ -63,59 +69,62 @@
 </script>
 
 <body>
-    <img src="static/bg.jpg" alt="Countdown">
-    <div class="counter-column">
-        <span class="counter-title">Do odevzdání nudz 🍑 zbývá</span>
-        <div class="counter">
-            <div class="counter-item">
-                <div class="counter-item-number">{days}</div>
-                <div class="counter-item-text">Dny</div>
+    <div class="body">
+
+        <img src="static/bg.jpg" alt="Countdown">
+        <div class="counter-column">
+            <span class="counter-title">Do odevzdání nudz 🍑 zbývá</span>
+            <div class="counter">
+                <div class="counter-item">
+                    <div class="counter-item-number">{days}</div>
+                    <div class="counter-item-text">Dny</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-divider">:</div>
+                    <div class="counter-item-text" style="visibility: hidden;">T</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-item-number">{hours}</div>
+                    <div class="counter-item-text">Hodiny</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-divider">:</div>
+                    <div class="counter-item-text" style="visibility: hidden;">T</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-item-number">{minutes}</div>
+                    <div class="counter-item-text">Minuty</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-divider">:</div>
+                    <div class="counter-item-text" style="visibility: hidden;">T</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-item-number">{seconds}</div>
+                    <div class="counter-item-text">Sekundy</div>
+                </div>
             </div>
-            <div class="counter-item">
-                <div class="counter-divider">:</div>
-                <div class="counter-item-text" style="visibility: hidden;">T</div>
-            </div>
-            <div class="counter-item">
-                <div class="counter-item-number">{hours}</div>
-                <div class="counter-item-text">Hodiny</div>
-            </div>
-            <div class="counter-item">
-                <div class="counter-divider">:</div>
-                <div class="counter-item-text" style="visibility: hidden;">T</div>
-            </div>
-            <div class="counter-item">
-                <div class="counter-item-number">{minutes}</div>
-                <div class="counter-item-text">Minuty</div>
-            </div>
-            <div class="counter-item">
-                <div class="counter-divider">:</div>
-                <div class="counter-item-text" style="visibility: hidden;">T</div>
-            </div>
-            <div class="counter-item">
-                <div class="counter-item-number">{seconds}</div>
-                <div class="counter-item-text">Sekundy</div>
-            </div>
+            <span class="counter-title" style="visibility: hidden;">D</span>
         </div>
-        <span class="counter-title" style="visibility: hidden;">D</span>
-    </div>
-    <p class="svatek-text">Dnes má svátek {svatek}</p> 
-    <div class="buttons">
-        <div class="button-sprint">
-            <Button variation="clear" on:click="{sprintClick}">
-                <i class="fa {sprintButtonsVisible?"fa-chevron-down":"fa-chevron-up"}"></i>
-                Hodnocení sprintu
-            </Button>
-        </div>
-        {#if sprintButtonsVisible}
-            <div class="buttons-scores" transition:fade={{ duration: 500}}>
-                <Button variation="clear" href="/sprint-0-20">0-20</Button>
-                <Button variation="clear" href="/sprint-20-40">20-40</Button>
-                <Button variation="clear" href="/sprint-40-60">40-60</Button>
-                <Button variation="clear" href="/sprint-60-80">60-80</Button>
-                <Button variation="clear" href="/sprint-80-100">80-100</Button>
-                <Button variation="clear" href="/sprint-100-120">100-120</Button>
+        <p class="svatek-text">Dnes má svátek {svatek}/{svatekSk} (cz/sk)</p> 
+        <div class="buttons">
+            <div class="button-sprint">
+                <Button variation="clear" on:click="{sprintClick}">
+                    <i class="fa {sprintButtonsVisible?"fa-chevron-down":"fa-chevron-up"}"></i>
+                    Hodnocení sprintu
+                </Button>
             </div>
-        {/if}
+            {#if sprintButtonsVisible}
+                <div class="buttons-scores" transition:fade={{ duration: 500}}>
+                    <Button variation="clear" href="/sprint-0-20">0-20</Button>
+                    <Button variation="clear" href="/sprint-20-40">20-40</Button>
+                    <Button variation="clear" href="/sprint-40-60">40-60</Button>
+                    <Button variation="clear" href="/sprint-60-80">60-80</Button>
+                    <Button variation="clear" href="/sprint-80-100">80-100</Button>
+                    <Button variation="clear" href="/sprint-100-120">100-120</Button>
+                </div>
+            {/if}
+        </div>
     </div>
 </body>
 
@@ -123,7 +132,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;400&display=swap');
     @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
 
-    body {
+    .body {
         display: flex;
         flex-direction: column;
         justify-content: center;
